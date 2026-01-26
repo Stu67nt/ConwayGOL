@@ -153,9 +153,11 @@ def main():
         print("\033[H\033[3J", end="")
         draw_grid(grid)
         print(f"Generation: {gen}     {event_text}")
-        """reset = input("")
+        """
+        reset = input("")
         if reset == "r":
-            break"""
+            break
+        """
 
 while True:
     os.system('cls' if os.name == 'nt' else 'clear')
