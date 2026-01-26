@@ -51,7 +51,7 @@ def draw_grid(grid):
     for row in grid:
         print("".join(f"{char[1]}{char[0]}{RESET}" for char in row))
 
-def check_state(grid, row_i, column_i):
+def check_state(grid, row_i, column_i, state="Normal"):
     cell_char = grid[row_i][column_i][0]
     live_neighbours = 0
 
@@ -76,23 +76,36 @@ def check_state(grid, row_i, column_i):
     if row_i != grid_height-1 and column_i != grid_len-1 and grid[row_i + 1][column_i + 1][0] == "@":
         live_neighbours += 1
     pass
-    if live_neighbours > 3:  # Overpopulation
-        cell_char = " "
-    elif 2 <= live_neighbours <= 3:  # Mantained population
-        cell_char = cell_char
-    elif live_neighbours < 2:  # Underpopulation
-        cell_char = " "
 
-    # Reproduction
-    if live_neighbours == 3 and cell_char == " ":
-        cell_char = "@"
+    if state in ["Normal", "Heat"]:
+        if live_neighbours > 3:  # Overpopulation
+            cell_char = " "
+        elif 2 <= live_neighbours <= 3:  # Mantained population
+            cell_char = cell_char
+        elif live_neighbours < 2:  # Underpopulation
+            cell_char = " "
+
+        # Reproduction
+        if live_neighbours == 3 and cell_char == " ":
+            cell_char = "@"
+        elif live_neighbours == 2 and cell_char == " " and state == "Heat":
+            cell_char = "@"
+        return cell_char
+
+    if state == "Famine":
+        if live_neighbours > 2:  # Overpopulation
+            cell_char = " "
+        elif live_neighbours == 2:  # Mantained population
+            cell_char = cell_char
+        elif live_neighbours < 2:  # Underpopulation
+            cell_char = " "
 
     return cell_char
 
 def main():
     just_fix_windows_console()  # Needed as otherwise ANSII Escape codes bug out.
     COLOURMAP = [" ", "@"]
-    EVENTS, EVENT_WEIGHTS = ["Normal", "Thanos Snap", "Acid Rain"], [998, 1, 1]
+    EVENTS, EVENT_WEIGHTS = ["Normal", "Famine", "Heat"], [247, 1, 2]
     gen = 0
 
     try:
@@ -115,23 +128,31 @@ def main():
         current_event = random.choices((EVENTS), weights = EVENT_WEIGHTS, k=1)[0]
         if current_event == "Normal":
             event_text = "Just a Normal Day :D"
+        elif current_event == "Famine":
+            event_text = "Food Supplies are Dwindling"
+        elif current_event == "Heat":
+            event_text = "Love is in the air"
+        """
         elif current_event == "Thanos Snap":
             event_text = "Thanos Gathered the Infinity Stones"
         elif current_event == "Acid Rain":
             event_text = "This rain is burning"
+        """
 
-        grid_copy = copy.deepcopy(grid)
-        for row_i in range(0, len(grid)):
-            for column_i in range(0, len(grid[row_i])):
-                grid_copy[row_i][column_i][0] = check_state(grid, row_i, column_i)
+
+        if current_event in ["Normal", "Heat", "Famine"]:
+            grid_copy = copy.deepcopy(grid)
+            for row_i in range(0, len(grid)):
+                for column_i in range(0, len(grid[row_i])):
+                    grid_copy[row_i][column_i][0] = check_state(grid, row_i, column_i, state = current_event)
+
+        if current_event != "Normal":
+            input(event_text)
 
         grid = copy.deepcopy(grid_copy)
         print("\033[H\033[3J", end="")
         draw_grid(grid)
         print(f"Generation: {gen}     {event_text}")
-        if current_event != "Normal":
-            input()
-            os.system('cls' if os.name == 'nt' else 'clear')
         """reset = input("")
         if reset == "r":
             break"""
