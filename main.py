@@ -77,7 +77,7 @@ def check_state(grid, row_i, column_i, state="Normal"):
         live_neighbours += 1
     pass
 
-    if state in ["Normal", "Heat"]:
+    if state in ["Normal", "Love"]:
         if live_neighbours > 3:  # Overpopulation
             cell_char = " "
         elif 2 <= live_neighbours <= 3:  # Mantained population
@@ -88,7 +88,7 @@ def check_state(grid, row_i, column_i, state="Normal"):
         # Reproduction
         if live_neighbours == 3 and cell_char == " ":
             cell_char = "@"
-        elif live_neighbours == 2 and cell_char == " " and state == "Heat":
+        elif live_neighbours == 2 and cell_char == " " and state == "Love":
             cell_char = "@"
         return cell_char
 
@@ -105,7 +105,7 @@ def check_state(grid, row_i, column_i, state="Normal"):
 def main():
     just_fix_windows_console()  # Needed as otherwise ANSII Escape codes bug out.
     COLOURMAP = [" ", "@"]
-    EVENTS, EVENT_WEIGHTS = ["Normal", "Famine", "Heat"], [247, 1, 2]
+    EVENTS, EVENT_WEIGHTS = ["Normal", "Famine", "Love"], [247, 1, 2]
     gen = 0
 
     try:
@@ -130,7 +130,7 @@ def main():
             event_text = "Just a Normal Day :D"
         elif current_event == "Famine":
             event_text = "Food Supplies are Dwindling"
-        elif current_event == "Heat":
+        elif current_event == "Love":
             event_text = "Love is in the air"
         """
         elif current_event == "Thanos Snap":
@@ -140,7 +140,7 @@ def main():
         """
 
 
-        if current_event in ["Normal", "Heat", "Famine"]:
+        if current_event in ["Normal", "Love", "Famine"]:
             grid_copy = copy.deepcopy(grid)
             for row_i in range(0, len(grid)):
                 for column_i in range(0, len(grid[row_i])):
