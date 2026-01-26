@@ -24,7 +24,7 @@ def generate_initial_cells(x:int=100, y:int=50): # [y,x] coordinate system
     grid = [[None for _ in range(x)] for _ in range(y)]
     x_len = len(grid[0])
     for row_i in range(0, len(grid)):
-        grid[row_i] = random.choices([0,1], weights = [90, 10], k=x_len)
+        grid[row_i] = random.choices([0, 1, 2], weights = [899, 100, 1], k=x_len)
         for column_i in range(0, len(grid[row_i])):
             grid[row_i][column_i] = [grid[row_i][column_i],
                                      random.choices((COLOURS), weights = [2, 2, 2, 2, 2, 2, 88], k=1)[0]]
@@ -41,6 +41,8 @@ def colourmap_grid(grid, colourmap):
         for column_i in range(0, len(grid[row_i])):
             if grid[row_i][column_i][0] == 1:
                 grid[row_i][column_i][0] = "@"
+            elif grid[row_i][column_i][0] == 2:
+                grid[row_i][column_i][0] = "X"
             else:
                 grid[row_i][column_i][0] = " "
     return grid
@@ -75,9 +77,8 @@ def check_state(grid, row_i, column_i, state="Normal"):
         live_neighbours += 1
     if row_i != grid_height-1 and column_i != grid_len-1 and grid[row_i + 1][column_i + 1][0] == "@":
         live_neighbours += 1
-    pass
 
-    if state in ["Normal", "Love"]:
+    if state in ["Normal", "Love"] and cell_char != "X":
         if live_neighbours > 3:  # Overpopulation
             cell_char = " "
         elif 2 <= live_neighbours <= 3:  # Mantained population
@@ -86,26 +87,31 @@ def check_state(grid, row_i, column_i, state="Normal"):
             cell_char = " "
 
         # Reproduction
-        if live_neighbours == 3 and cell_char == " ":
-            cell_char = "@"
-        elif live_neighbours == 2 and cell_char == " " and state == "Love":
-            cell_char = "@"
-        return cell_char
+    if live_neighbours == 3 and cell_char in [" ", "X"]:
+        cell_char = "@"
+    elif live_neighbours == 2 and cell_char in [" ", "X"] and state == "Love":
+        cell_char = "@"
+
 
     if state == "Famine":
-        if live_neighbours > 2:  # Overpopulation
-            cell_char = " "
-        elif live_neighbours == 2:  # Mantained population
-            cell_char = cell_char
-        elif live_neighbours < 2:  # Underpopulation
-            cell_char = " "
+        if cell_char != "X":
+            if live_neighbours > 2:  # Overpopulation
+                cell_char = " "
+            elif live_neighbours == 2:  # Mantained population
+                cell_char = cell_char
+            elif live_neighbours < 2:  # Underpopulation
+                cell_char = " "
+
+        # Reproduction
+        if live_neighbours == 4 and cell_char == " ":
+            cell_char = "@"
 
     return cell_char
 
 def main():
     just_fix_windows_console()  # Needed as otherwise ANSII Escape codes bug out.
-    COLOURMAP = [" ", "@"]
-    EVENTS, EVENT_WEIGHTS = ["Normal", "Famine", "Love"], [247, 1, 2]
+    COLOURMAP = [" ", "@", "X"]
+    EVENTS, EVENT_WEIGHTS = ["Normal", "Famine", "Love"], [497, 1, 2]
     gen = 0
 
     try:
@@ -126,9 +132,7 @@ def main():
 
     for gen in range(1,1001):
         current_event = random.choices((EVENTS), weights = EVENT_WEIGHTS, k=1)[0]
-        if current_event == "Normal":
-            event_text = "Just a Normal Day :D"
-        elif current_event == "Famine":
+        if current_event == "Famine":
             event_text = "Food Supplies are Dwindling"
         elif current_event == "Love":
             event_text = "Love is in the air"
@@ -142,17 +146,21 @@ def main():
 
         if current_event in ["Normal", "Love", "Famine"]:
             grid_copy = copy.deepcopy(grid)
+            bomb_count = 0
             for row_i in range(0, len(grid)):
                 for column_i in range(0, len(grid[row_i])):
                     grid_copy[row_i][column_i][0] = check_state(grid, row_i, column_i, state = current_event)
+                    if grid_copy[row_i][column_i][0] == "X":
+                        bomb_count += 1
 
         if current_event != "Normal":
             input(event_text)
+            print("\033[2J", end="")
 
         grid = copy.deepcopy(grid_copy)
         print("\033[H\033[3J", end="")
         draw_grid(grid)
-        print(f"Generation: {gen}     {event_text}")
+        print(f"Generation: {gen}  Bombs Remianing: {bomb_count}")
         """
         reset = input("")
         if reset == "r":
@@ -162,8 +170,8 @@ def main():
 while True:
     os.system('cls' if os.name == 'nt' else 'clear')
     main()
-    x, y = os.get_terminal_size()
-    print(x, y)
+    # x, y = os.get_terminal_size()
+    # print(x, y)
     is_exit = input("Exit (y/n): ")
     if is_exit == "y":
         break
