@@ -5,6 +5,8 @@ This project is a simulation of the famous 0 player cell automata game Conway's 
 ---
 ## Video Demo
 
+Click to Watch
+[<img width="1919" height="943" alt="Screenshot 2026-01-27 205231" src="https://github.com/user-attachments/assets/cf18b41a-c516-4353-83bd-2fc321b5996d" />](https://www.youtube.com/embed/Jd3jaw7pn30)
 ---
 
 ## Features
@@ -33,11 +35,11 @@ You will get to see the inital state of the board before you start. If you wish 
 To change the board size quickly you need to zoom out/in in the terminal and/or change the font size. To zoom in or out quickly in the Windows terminal hold CRTL+Scroll. 
   
 ## Build & Run
-This program has only been tested to run on Windows 11 so I cannot guarantee function on other platforms.
+This program has only been tested to run on Windows 11 so I cannot guarantee function on other platforms however I do not believe there is any reason why it shouldn't work.
 #### Windows
-    
-    will be added soon
 
+    pip install ConwayGameOfLife
+    ConwayGameOfLife
 
 
 ## AI Usage
