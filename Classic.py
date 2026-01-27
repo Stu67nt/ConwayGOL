@@ -1,3 +1,7 @@
+"""
+Look at Evented.py for funtion explanations.
+"""
+
 from colorama import just_fix_windows_console  # Fixes Issue with ANSII codes not working
 import numpy as np
 import random
@@ -12,7 +16,7 @@ def generate_initial_cells(x:int=100, y:int=50, cell_weights = [92, 8]): # [y,x]
         grid[row_i] = random.choices([0,1], weights = cell_weights, k=x_len)
     return grid
 
-def colourmap_grid(grid, colourmap):
+def colourmap_grid(grid):
     for row_i in range(0, len(grid)):
         for column_i in range(0, len(grid[row_i])):
             if grid[row_i][column_i] == 1:
@@ -65,7 +69,6 @@ def check_state(grid, row_i, column_i):
 
 def main(total_gens = 1000, cell_weights = [92, 8]):
     just_fix_windows_console()  # Needed as otherwise ANSII Escape codes bug out.
-    COLOURMAP = [" ", "@"]
     gen = 0
     reset = "r"
     while reset == "r":
@@ -75,11 +78,11 @@ def main(total_gens = 1000, cell_weights = [92, 8]):
             x, y = (20, 20)
 
         grid = generate_initial_cells(x, y-3, cell_weights = cell_weights)
-        grid = colourmap_grid(grid=grid, colourmap= COLOURMAP)
+        grid = colourmap_grid(grid=grid)
 
         draw_grid(grid)
         print(f"Generation: {gen}")
-        reset = input("Reset Grid? ")
+        reset = input("Reset Grid (r)? ")
 
         os.system('cls' if os.name == 'nt' else 'clear')
 
@@ -92,7 +95,7 @@ def main(total_gens = 1000, cell_weights = [92, 8]):
         print("\033[H\033[3J", end="")
         draw_grid(grid)
         print(f"Generation: {gen}")
-
+    input("Press enter to proceed")
 
 if __name__ == "__main__":
     main()

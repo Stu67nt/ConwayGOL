@@ -14,12 +14,15 @@ def run():
 		while modify_weights.lower() not in ["y", "n"]:
 			modify_weights = input("Modify Weights (y/n): ")
 
+		gens = "None"
+		while not gens.isdigit():
+			gens = input("Enter number of generations to simulate: ")
+		gens = int(gens)
+
 		values = {}
 		if mode.lower() == "e":
-			# Used ai for this cause im lazy
 			if modify_weights == "y":
 				fields = [
-					("gens", "Enter num of generations to simulate"),
 					("dead", "Dead Cell Weight"),
 					("alive", "Alive Cell Weight"),
 					("bomb", "Bomb Cell Weight"),
@@ -37,7 +40,7 @@ def run():
 						print("Please enter a valid integer.")
 
 				e.main(
-					total_gens=values["gens"],
+					total_gens=gens,
 					event_weights=[
 						values["normal"],
 						values["famine"],
@@ -50,12 +53,11 @@ def run():
 					]
 				)
 			else:
-				e.main()
+				e.main(total_gens=gens)
 
 		elif mode.lower() == "c":
 			if modify_weights == "y":
 				fields = [
-					("gens", "Enter num of generations to simulate"),
 					("dead", "Dead Cell Weight"),
 					("alive", "Alive Cell Weight")
 				]
@@ -67,10 +69,10 @@ def run():
 							values[key] = int(val)
 							break
 						print("Please enter a valid number.")
-				c.main(total_gens=values["gens"],
+				c.main(total_gens=gens,
 					   cell_weights=[values["dead"], values["alive"]])
 			else:
-				c.main()
+				c.main(total_gens=gens)
 
 		is_exit = input("Exit (y/n): ")
 		if is_exit == "y":
