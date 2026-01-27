@@ -5,11 +5,11 @@ import fpstimer
 import os
 import time
 
-def generate_initial_cells(x:int=100, y:int=50): # [y,x] coordinate system
+def generate_initial_cells(x:int=100, y:int=50, cell_weights = [92, 8]): # [y,x] coordinate system
     grid = [[None for _ in range(x)] for _ in range(y)]
     x_len = len(grid[0])
     for row_i in range(0, len(grid)):
-        grid[row_i] = random.choices([0,1], weights = [92, 8], k=x_len)
+        grid[row_i] = random.choices([0,1], weights = cell_weights, k=x_len)
     return grid
 
 def colourmap_grid(grid, colourmap):
@@ -63,7 +63,7 @@ def check_state(grid, row_i, column_i):
 
     return cell_char
 
-def main():
+def main(total_gens = 1000, cell_weights = [92, 8]):
     just_fix_windows_console()  # Needed as otherwise ANSII Escape codes bug out.
     COLOURMAP = [" ", "@"]
     gen = 0
@@ -74,7 +74,7 @@ def main():
         except OSError:
             x, y = (20, 20)
 
-        grid = generate_initial_cells(x, y-3)
+        grid = generate_initial_cells(x, y-3, cell_weights = cell_weights)
         grid = colourmap_grid(grid=grid, colourmap= COLOURMAP)
 
         draw_grid(grid)
@@ -83,7 +83,7 @@ def main():
 
         os.system('cls' if os.name == 'nt' else 'clear')
 
-    for gen in range(1,1001):
+    for gen in range(1,total_gens+1):
         grid_copy = [row[:] for row in grid]
         for row_i in range(0, len(grid)):
             for column_i in range(0, len(grid[row_i])):

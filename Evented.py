@@ -6,7 +6,7 @@ import os
 import time
 import copy
 
-def generate_initial_cells(x:int=100, y:int=50): # [y,x] coordinate system
+def generate_initial_cells(x:int=100, y:int=50, cell_weights = [899,100,1]): # [y,x] coordinate system
     """
     Generates the inital grid for the simulation.
     :param x: length of the grid
@@ -24,7 +24,7 @@ def generate_initial_cells(x:int=100, y:int=50): # [y,x] coordinate system
     grid = [[None for _ in range(x)] for _ in range(y)]
     x_len = len(grid[0])
     for row_i in range(0, len(grid)):
-        grid[row_i] = random.choices([0, 1, 2], weights = [899, 100, 1], k=x_len)
+        grid[row_i] = random.choices([0, 1, 2], weights = cell_weights, k=x_len)
         for column_i in range(0, len(grid[row_i])):
             grid[row_i][column_i] = [grid[row_i][column_i],
                                      random.choices((COLOURS), weights = [2, 2, 2, 2, 2, 2, 88], k=1)[0]]
@@ -142,10 +142,10 @@ def explode_bomb(grid, row_i, column_i):
 
     return grid
 
-def main():
+def main(cell_weights = [899, 100, 1], event_weights = [97, 1, 2], total_gens = 1000):
     just_fix_windows_console()  # Needed as otherwise ANSII Escape codes bug out.
     COLOURMAP = [" ", "@", "X"]
-    EVENTS, EVENT_WEIGHTS = ["Normal", "Famine", "Love"], [297, 1, 2]
+    EVENTS, EVENT_WEIGHTS = ["Normal", "Famine", "Love"], event_weights
     gen = 0
     event_start = 1
     reset = "r"
@@ -156,7 +156,7 @@ def main():
         except OSError:
             x, y = (20, 20)
 
-        grid = generate_initial_cells(x, y-3)
+        grid = generate_initial_cells(x, y-3, cell_weights = cell_weights)
         grid = colourmap_grid(grid=grid, colourmap= COLOURMAP)
 
         draw_grid(grid)
@@ -165,7 +165,7 @@ def main():
 
         os.system('cls' if os.name == 'nt' else 'clear')
 
-    for gen in range(1,1001):
+    for gen in range(1,total_gens+1):
         if event_start not in range(gen-1, random.randint(gen-6, gen-2), -1):
             current_event = random.choices((EVENTS), weights = EVENT_WEIGHTS, k=1)[0]
             if current_event == "Normal":
