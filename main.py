@@ -56,7 +56,7 @@ def draw_grid(grid):
 def check_state(grid, row_i, column_i, state="Normal"):
     cell_char = grid[row_i][column_i][0]
     live_neighbours = 0
-
+    explosion_flag = False
     grid_height = len(grid)
     grid_len = len(grid[0])
 
@@ -86,27 +86,61 @@ def check_state(grid, row_i, column_i, state="Normal"):
         elif live_neighbours < 2:  # Underpopulation
             cell_char = " "
 
-        # Reproduction
-    if live_neighbours == 3 and cell_char in [" ", "X"]:
-        cell_char = "@"
-    elif live_neighbours == 2 and cell_char in [" ", "X"] and state == "Love":
-        cell_char = "@"
-
-
-    if state == "Famine":
+    # Reproduction
+    if live_neighbours == 3:
         if cell_char != "X":
-            if live_neighbours > 2:  # Overpopulation
-                cell_char = " "
-            elif live_neighbours == 2:  # Mantained population
-                cell_char = cell_char
-            elif live_neighbours < 2:  # Underpopulation
-                cell_char = " "
+            cell_char = "@"
+        else:
+            cell_char = " "
+            explosion_flag = True
+    elif live_neighbours == 2 and state == "Love":
+        if cell_char != "X":
+            cell_char = "@"
+        else:
+            cell_char = " "
+            explosion_flag = True
+
+
+    if state == "Famine" and cell_char != "X":
+        if live_neighbours > 2:  # Overpopulation
+            cell_char = " "
+        elif live_neighbours == 2:  # Mantained population
+            cell_char = cell_char
+        elif live_neighbours < 2:  # Underpopulation
+            cell_char = " "
 
         # Reproduction
-        if live_neighbours == 4 and cell_char == " ":
-            cell_char = "@"
+        if live_neighbours == 4:
+            if cell_char != "X":
+                cell_char = "@"
+            else:
+                cell_char = " "
+                explosion_flag = True
 
-    return cell_char
+    return cell_char, explosion_flag
+
+def explode_bomb(grid, row_i, column_i):
+    grid_height = len(grid)
+    grid_len = len(grid[0])
+
+    if row_i != 0 and column_i != 0:
+        grid[row_i - 1][column_i - 1][0] == " "
+    if row_i != 0:
+        grid[row_i - 1][column_i][0] == " "
+    if row_i != 0 and column_i != grid_len-1:
+        grid[row_i - 1][column_i + 1][0] == " "
+    if column_i != 0:
+        grid[row_i][column_i - 1][0] == " "
+    if column_i != grid_len-1:
+        grid[row_i][column_i + 1][0] == " "
+    if row_i != grid_height-1 and column_i != 0:
+        grid[row_i + 1][column_i - 1][0] == " "
+    if row_i != grid_height-1:
+        grid[row_i + 1][column_i][0] == " "
+    if row_i != grid_height-1 and column_i != grid_len-1:
+        grid[row_i + 1][column_i + 1][0] == " "
+
+    return grid
 
 def main():
     just_fix_windows_console()  # Needed as otherwise ANSII Escape codes bug out.
@@ -133,7 +167,7 @@ def main():
     for gen in range(1,1001):
         current_event = random.choices((EVENTS), weights = EVENT_WEIGHTS, k=1)[0]
         if current_event == "Famine":
-            event_text = "Food Supplies are Dwindling"
+            event_text = "Food supplies are dwindling"
         elif current_event == "Love":
             event_text = "Love is in the air"
         """
@@ -149,7 +183,10 @@ def main():
             bomb_count = 0
             for row_i in range(0, len(grid)):
                 for column_i in range(0, len(grid[row_i])):
-                    grid_copy[row_i][column_i][0] = check_state(grid, row_i, column_i, state = current_event)
+                    grid_copy[row_i][column_i][0], explosion_flag = check_state(grid, row_i, column_i, state = current_event)
+                    if explosion_flag == True:
+                        grid_copy = explode_bomb(grid_copy, row_i, column_i)
+                        input("Bomb went off")
                     if grid_copy[row_i][column_i][0] == "X":
                         bomb_count += 1
 
