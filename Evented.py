@@ -145,37 +145,40 @@ def explode_bomb(grid, row_i, column_i):
 def main():
     just_fix_windows_console()  # Needed as otherwise ANSII Escape codes bug out.
     COLOURMAP = [" ", "@", "X"]
-    EVENTS, EVENT_WEIGHTS = ["Normal", "Famine", "Love"], [497, 1, 2]
+    EVENTS, EVENT_WEIGHTS = ["Normal", "Famine", "Love"], [297, 1, 2]
     gen = 0
+    event_start = 1
+    reset = "r"
 
-    try:
-        x, y = os.get_terminal_size()
-    except OSError:
-        x, y = (20, 20)
+    while reset == "r":
+        try:
+            x, y = os.get_terminal_size()
+        except OSError:
+            x, y = (20, 20)
 
-    grid = generate_initial_cells(x, y-3)
-    grid = colourmap_grid(grid=grid, colourmap= COLOURMAP)
+        grid = generate_initial_cells(x, y-3)
+        grid = colourmap_grid(grid=grid, colourmap= COLOURMAP)
 
-    draw_grid(grid)
-    print(f"Generation: {gen}")
-    reset = input("Reset Grid? ")
+        draw_grid(grid)
+        print(f"Generation: {gen}")
+        reset = input("Reset Grid? ")
 
-    os.system('cls' if os.name == 'nt' else 'clear')
-    if reset == "r":
-        return -1
+        os.system('cls' if os.name == 'nt' else 'clear')
 
     for gen in range(1,1001):
-        current_event = random.choices((EVENTS), weights = EVENT_WEIGHTS, k=1)[0]
-        if current_event == "Famine":
-            event_text = "Food supplies are dwindling"
-        elif current_event == "Love":
-            event_text = "Love is in the air"
-        """
-        elif current_event == "Thanos Snap":
-            event_text = "Thanos Gathered the Infinity Stones"
-        elif current_event == "Acid Rain":
-            event_text = "This rain is burning"
-        """
+        if event_start not in range(gen-1, random.randint(gen-6, gen-2), -1):
+            current_event = random.choices((EVENTS), weights = EVENT_WEIGHTS, k=1)[0]
+            if current_event == "Normal":
+                event_text = "Just a normal day!"
+                event_start = gen
+            elif current_event == "Famine":
+                event_text = "The hunger grows  "
+                event_start = gen
+            elif current_event == "Love":
+                event_text = "Love is in the air"
+                event_start = gen
+        else:
+            pass
 
 
         if current_event in ["Normal", "Love", "Famine"]:
@@ -186,29 +189,18 @@ def main():
                     grid_copy[row_i][column_i][0], explosion_flag = check_state(grid, row_i, column_i, state = current_event)
                     if explosion_flag == True:
                         grid_copy = explode_bomb(grid_copy, row_i, column_i)
-                        input("Bomb went off")
                     if grid_copy[row_i][column_i][0] == "X":
                         bomb_count += 1
-
-        if current_event != "Normal":
-            input(event_text)
-            print("\033[2J", end="")
 
         grid = copy.deepcopy(grid_copy)
         print("\033[H\033[3J", end="")
         draw_grid(grid)
         print(f"Generation: {gen}  Bombs Remianing: {bomb_count}")
+        print(event_text)
         """
         reset = input("")
         if reset == "r":
             break
         """
 
-while True:
-    os.system('cls' if os.name == 'nt' else 'clear')
-    main()
-    # x, y = os.get_terminal_size()
-    # print(x, y)
-    is_exit = input("Exit (y/n): ")
-    if is_exit == "y":
-        break
+
