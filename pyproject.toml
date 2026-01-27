@@ -1,0 +1,28 @@
+[build-system]
+requires = ["hatchling >= 1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ConwayGameOfLife"
+version = "1.0.0"
+description = "Conway's Game of Life with extra events."
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+]
+license = "MIT"
+license-files = ["LICEN[CS]E*"]
+
+dependencies = [
+    "colorama"
+]
+
+[project.scripts]
+ConwayGameOfLife = "ConwayGameOfLife.main:run"
+
+[project.urls]
+Homepage = "https://github.com/Stu67nt/ConwayGOL"
+
+[tool.hatch.build.targets.wheel]
+packages = ["ConwayGameOfLife"]
