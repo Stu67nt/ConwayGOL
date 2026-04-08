@@ -3,11 +3,6 @@
 This project is a simulation of the famous 0 player cell automata game Conway's Game of life! It can simulate the regular game as well as a special mode with extra sudden events to add randomness to the deterministic game.
 
 ---
-## Video Demo
-
-Click to Watch
-[<img width="1919" height="943" alt="Screenshot 2026-01-27 205231" src="https://github.com/user-attachments/assets/cf18b41a-c516-4353-83bd-2fc321b5996d" />](https://www.youtube.com/embed/Jd3jaw7pn30)
----
 
 ## Features
 
